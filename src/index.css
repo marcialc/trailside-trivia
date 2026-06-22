@@ -1,15 +1,33 @@
 :root{
-  --obsidian:#15120F;
-  --basalt:#211C18;
-  --basalt-2:#2A241F;
-  --sinter:#EDE7DB;
-  --steam:#9D9488;
-  --steam-dim:#6E665C;
-  --hairline:rgba(237,231,219,.10);
-  --hairline-2:rgba(237,231,219,.16);
-  /* thermal spectrum — hot center to cooler rim of a Yellowstone spring.
-     Kept as global tokens for the shared chrome; per-subject accents now
-     travel as literal hex inside each park's data file. */
+  /* ---------- HAND-DRAWN PAPER PALETTE ---------- */
+  --paper:#fdfbf7;        /* warm paper — page background */
+  --card:#ffffff;         /* clean note paper — card surfaces */
+  --pencil:#2d2d2d;       /* soft pencil black — text + borders (never pure black) */
+  --pencil-soft:#6b645b;  /* lighter pencil — secondary text */
+  --muted:#e5e0d8;        /* old paper / erased pencil */
+  --accent:#ff4d4d;       /* red correction marker */
+  --ink:#2d5da1;          /* blue ballpoint pen */
+  --postit:#fff9c4;       /* post-it yellow */
+  --tape:rgba(45,45,45,.12); /* translucent tape strip */
+
+  /* functional correctness colours (kept legible against paper) */
+  --right:#3f9d54;        /* green felt-tip */
+  --wrong:var(--accent);
+
+  /* legacy aliases — existing modules reference these names; remap to the
+     paper palette so nothing dangles while the look flips dark → light. */
+  --obsidian:var(--paper);
+  --basalt:var(--card);
+  --basalt-2:var(--muted);
+  --sinter:var(--pencil);
+  --steam:var(--pencil-soft);
+  --steam-dim:#8a837a;
+  --hairline:rgba(45,45,45,.16);
+  --hairline-2:var(--pencil);
+
+  /* per-subject thermal spectrum — park data ships literal hex per the
+     "self-contained park file" invariant; these remain only for shared chrome
+     fallbacks (e.g. the quiz default accent). */
   --c-prismatic:#3F8FD0;
   --c-oldfaithful:#E3A33C;
   --c-norris:#BFCE52;
@@ -18,26 +36,36 @@
   --c-lamar:#74A85E;
   --c-hayden:#2FA294;
   --c-caldera:#A074C8;
-  --display:'Bricolage Grotesque',system-ui,sans-serif;
-  --body:'Newsreader',Georgia,serif;
-  --mono:'JetBrains Mono',ui-monospace,monospace;
+
+  /* ---------- TYPOGRAPHY (exclusively handwritten) ---------- */
+  --display:'Kalam',cursive;                 /* thick felt-tip marker — headings */
+  --body:'Patrick Hand','Kalam',cursive;     /* legible handwriting — body */
+  --mono:'Patrick Hand','Kalam',cursive;     /* uppercase + tracking → label feel */
+
+  /* ---------- WOBBLY RADII (no straight lines) ---------- */
+  --wobbly:255px 15px 225px 15px / 15px 225px 15px 255px;       /* buttons */
+  --wobbly-md:22px 30px 24px 34px / 30px 22px 34px 24px;        /* cards / containers */
+  --wobbly-sm:14px 10px 16px 9px / 10px 16px 9px 14px;          /* small chips, inputs */
+  --wobbly-pill:140px 18px 140px 18px / 18px 140px 18px 140px;  /* pills */
+
+  /* ---------- HARD OFFSET SHADOWS (no blur — cut-paper collage) ---------- */
+  --shadow:4px 4px 0 0 var(--pencil);
+  --shadow-lg:8px 8px 0 0 var(--pencil);
+  --shadow-soft:3px 3px 0 0 rgba(45,45,45,.12);
 }
 *{box-sizing:border-box;margin:0;padding:0}
 html{-webkit-text-size-adjust:100%}
 body{
-  background:var(--obsidian);
-  color:var(--sinter);
+  background:var(--paper);
+  color:var(--pencil);
   font-family:var(--body);
-  line-height:1.5;
+  font-size:17px;
+  line-height:1.55;
   -webkit-font-smoothing:antialiased;
   overflow-x:hidden;
-}
-/* faint volcanic vignette + drifting steam */
-body::before{
-  content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
-  background:
-    radial-gradient(120% 80% at 50% -10%, rgba(63,143,208,.10), transparent 55%),
-    radial-gradient(100% 60% at 90% 110%, rgba(203,92,57,.08), transparent 60%);
+  /* notebook-paper dot grain */
+  background-image:radial-gradient(var(--muted) 1.4px, transparent 1.4px);
+  background-size:24px 24px;
 }
 
 a{color:inherit}

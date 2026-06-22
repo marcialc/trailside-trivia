@@ -1,40 +1,42 @@
 .searchdock{
   position:sticky;top:0;z-index:30;
-  margin:22px -18px 4px;padding:12px 18px 13px;
-  background:linear-gradient(var(--obsidian) 72%,rgba(21,18,15,0));
-  backdrop-filter:blur(4px);
+  margin:22px -18px 4px;padding:14px 18px 15px;
+  background:linear-gradient(var(--paper) 74%,rgba(253,251,247,0));
 }
 .searchbox{position:relative}
-.searchbox svg{position:absolute;left:16px;top:50%;transform:translateY(-50%);width:18px;height:18px;color:var(--steam);pointer-events:none}
+.searchbox svg{position:absolute;left:16px;top:50%;transform:translateY(-50%) rotate(-6deg);width:20px;height:20px;color:var(--pencil);pointer-events:none}
 .input{
-  width:100%;font-family:var(--body);font-size:17px;color:var(--sinter);
-  background:var(--basalt);border:1px solid var(--hairline-2);border-radius:14px;
-  padding:15px 44px 15px 44px;outline:none;transition:border-color .18s,box-shadow .18s;
+  width:100%;font-family:var(--body);font-size:18px;color:var(--pencil);
+  background:var(--card);border:3px solid var(--pencil);border-radius:var(--wobbly-sm);
+  box-shadow:var(--shadow);
+  padding:15px 46px 15px 46px;outline:none;transition:border-color .12s,box-shadow .12s;
 }
-.input::placeholder{color:var(--steam-dim)}
-.input:focus{border-color:rgba(63,143,208,.55);box-shadow:0 0 0 3px rgba(63,143,208,.14)}
+.input::placeholder{color:var(--pencil-soft);opacity:.65}
+.input:focus{border-color:var(--ink);box-shadow:4px 4px 0 0 var(--ink),0 0 0 4px rgba(45,93,161,.18)}
 .clearbtn{
-  position:absolute;right:9px;top:50%;transform:translateY(-50%);
-  width:30px;height:30px;border-radius:50%;border:none;background:transparent;color:var(--steam);
-  font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;
+  position:absolute;right:12px;top:50%;transform:translateY(-50%);
+  width:30px;height:30px;border-radius:50%;border:2px solid var(--pencil);background:var(--paper);color:var(--pencil);
+  font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;transition:transform .1s,background .1s,color .1s;
 }
-.clearbtn:hover{color:var(--sinter);background:var(--basalt-2)}
+.clearbtn:hover{background:var(--accent);color:#fff;transform:translateY(-50%) rotate(8deg)}
 
 .ac{
-  position:absolute;left:0;right:0;top:calc(100% + 8px);z-index:40;
-  background:var(--basalt);border:1px solid var(--hairline-2);border-radius:14px;
-  box-shadow:0 24px 50px -18px rgba(0,0,0,.7);overflow:hidden;display:none;
+  position:absolute;left:0;right:0;top:calc(100% + 10px);z-index:40;
+  background:var(--card);border:3px solid var(--pencil);border-radius:var(--wobbly-md);
+  box-shadow:var(--shadow-lg);overflow:hidden;display:none;
 }
-.acOpen{display:block}
+.acOpen{display:block;animation:pop .12s ease both}
 .acItem{
-  display:flex;align-items:center;gap:12px;padding:12px 15px;cursor:pointer;
-  border-bottom:1px solid var(--hairline);
+  display:flex;align-items:center;gap:12px;padding:13px 16px;cursor:pointer;
+  border-bottom:2px dashed var(--muted);
 }
 .acItem:last-child{border-bottom:none}
-.acItem:hover,.acActive{background:var(--basalt-2)}
-.acDot{width:9px;height:9px;border-radius:50%;flex:none}
+.acItem:hover,.acActive{background:var(--postit)}
+.acDot{width:11px;height:11px;border-radius:50%;flex:none;border:1.5px solid var(--pencil)}
 .acText{min-width:0;flex:1}
-.acName{font-family:var(--display);font-weight:700;font-size:15.5px;letter-spacing:-.01em}
-.acWhy{font-family:var(--mono);font-size:11px;color:var(--steam);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.acWhy b{color:var(--c-oldfaithful);font-weight:600}
-.acArrow{color:var(--steam-dim);font-size:15px}
+.acName{font-family:var(--display);font-weight:700;font-size:17px}
+.acWhy{font-family:var(--mono);font-size:13px;color:var(--pencil-soft);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.acWhy b{color:var(--accent);font-weight:700}
+.acArrow{color:var(--ink);font-size:17px;font-weight:700}
+
+@keyframes pop{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}

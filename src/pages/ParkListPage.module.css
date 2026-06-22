@@ -1,27 +1,39 @@
 .wrap{position:relative;z-index:1;max-width:760px;margin:0 auto;padding:0 18px 80px}
-.hero{padding:30px 2px 18px}
-.eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--steam)}
+.hero{padding:34px 2px 18px}
+.eyebrow{font-family:var(--mono);font-size:14px;letter-spacing:.16em;text-transform:uppercase;color:var(--pencil-soft)}
 .title{
-  font-family:var(--display);font-weight:800;font-size:clamp(38px,12vw,62px);
-  line-height:.92;letter-spacing:-.02em;margin:12px 0 10px;
+  font-family:var(--display);font-weight:700;font-size:clamp(42px,13vw,68px);
+  line-height:.98;margin:14px 0 12px;transform:rotate(-1.2deg);transform-origin:left;
 }
-.lede{font-size:16.5px;color:var(--steam);max-width:46ch;font-weight:400}
+.lede{font-size:19px;color:var(--pencil);max-width:46ch;font-weight:400}
 
-.grid{display:grid;grid-template-columns:1fr;gap:14px;margin-top:22px}
+.grid{display:grid;grid-template-columns:1fr;gap:24px;margin-top:30px}
 @media(min-width:600px){.grid{grid-template-columns:1fr 1fr}}
 .card{
-  position:relative;display:block;text-decoration:none;color:inherit;
-  background:var(--basalt);border:1px solid var(--hairline);border-radius:16px;
-  padding:18px;overflow:hidden;transition:transform .18s ease,border-color .18s,background .18s;
-  animation:rise .5s both;
+  position:relative;display:block;text-decoration:none;color:var(--pencil);
+  background:var(--card);border:3px solid var(--pencil);border-radius:var(--wobbly-md);
+  box-shadow:var(--shadow);
+  padding:20px;overflow:visible;
+  --rot:-1.4deg;transform:rotate(var(--rot));
+  transition:transform .1s,box-shadow .1s;
+  animation:fade .5s both;
 }
-.card:hover{transform:translateY(-3px);border-color:var(--hairline-2);background:#241F1A}
-.band{display:inline-flex;height:9px;width:74px;border-radius:2px;overflow:hidden;margin-bottom:13px}
+.card:nth-child(even){--rot:1.4deg;background:var(--postit)}
+/* tape strip pinning each card */
+.card::before{
+  content:"";position:absolute;top:-11px;left:50%;width:96px;height:24px;
+  transform:translateX(-50%) rotate(-2.5deg);background:var(--tape);
+  border:1px dashed rgba(45,45,45,.25);
+}
+.card:hover{transform:rotate(1.2deg) translate(2px,2px);box-shadow:2px 2px 0 0 var(--pencil)}
+.card:active{transform:rotate(1.2deg) translate(4px,4px);box-shadow:none}
+.card:focus-visible{outline:3px dashed var(--ink);outline-offset:4px}
+.band{display:inline-flex;height:12px;width:78px;overflow:hidden;margin-bottom:14px;border:2px solid var(--pencil);border-radius:var(--wobbly-sm);transform:rotate(-1.5deg)}
 .band i{flex:1}
-.name{font-family:var(--display);font-weight:800;font-size:26px;line-height:1.02;letter-spacing:-.02em}
-.region{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--steam);margin-top:6px}
-.teaser{font-size:15px;color:#C9C2B5;line-height:1.42;margin-top:10px}
-.foot{display:flex;align-items:center;gap:10px;margin-top:14px;font-family:var(--mono);font-size:11px;color:var(--steam)}
-.go{margin-left:auto;color:var(--c-oldfaithful);font-weight:600;letter-spacing:.04em}
+.name{font-family:var(--display);font-weight:700;font-size:28px;line-height:1.04}
+.region{font-family:var(--mono);font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:var(--pencil-soft);margin-top:7px}
+.teaser{font-size:16.5px;color:var(--pencil);line-height:1.45;margin-top:11px}
+.foot{display:flex;align-items:center;gap:12px;margin-top:16px;padding-top:12px;border-top:2px dashed var(--muted);font-family:var(--mono);font-size:14px;color:var(--pencil-soft)}
+.go{margin-left:auto;color:var(--ink);font-weight:700}
 
-@keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+@keyframes fade{from{opacity:0}to{opacity:1}}

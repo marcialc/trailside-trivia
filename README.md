@@ -4,6 +4,8 @@
 
 Search a spot or tap a card to pull up its field notes. Test yourself with shuffled multiple-choice rounds and earn a ranger rank. The whole experience is driven by data files: **adding a new park is one file and one line — zero component changes.**
 
+**🔗 Live demo: [trailside-trivia.marcialandres06.workers.dev](https://trailside-trivia.marcialandres06.workers.dev/)**
+
 <p align="center">
   <em>Dark "obsidian / thermal" aesthetic · Bricolage Grotesque · Newsreader · JetBrains Mono</em>
 </p>

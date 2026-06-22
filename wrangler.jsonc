@@ -1,0 +1,11 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "national-parks-trivia",
+  "compatibility_date": "2026-06-01",
+  "assets": {
+    "not_found_handling": "single-page-application"
+  }
+  // When you add the API Worker later, also set:
+  // "main": "worker/index.ts",
+  // "kv_namespaces": [{ "binding": "SCORES", "id": "<your-kv-id>" }]
+}

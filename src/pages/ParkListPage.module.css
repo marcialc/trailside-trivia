@@ -1,0 +1,27 @@
+.wrap{position:relative;z-index:1;max-width:760px;margin:0 auto;padding:0 18px 80px}
+.hero{padding:30px 2px 18px}
+.eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--steam)}
+.title{
+  font-family:var(--display);font-weight:800;font-size:clamp(38px,12vw,62px);
+  line-height:.92;letter-spacing:-.02em;margin:12px 0 10px;
+}
+.lede{font-size:16.5px;color:var(--steam);max-width:46ch;font-weight:400}
+
+.grid{display:grid;grid-template-columns:1fr;gap:14px;margin-top:22px}
+@media(min-width:600px){.grid{grid-template-columns:1fr 1fr}}
+.card{
+  position:relative;display:block;text-decoration:none;color:inherit;
+  background:var(--basalt);border:1px solid var(--hairline);border-radius:16px;
+  padding:18px;overflow:hidden;transition:transform .18s ease,border-color .18s,background .18s;
+  animation:rise .5s both;
+}
+.card:hover{transform:translateY(-3px);border-color:var(--hairline-2);background:#241F1A}
+.band{display:inline-flex;height:9px;width:74px;border-radius:2px;overflow:hidden;margin-bottom:13px}
+.band i{flex:1}
+.name{font-family:var(--display);font-weight:800;font-size:26px;line-height:1.02;letter-spacing:-.02em}
+.region{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--steam);margin-top:6px}
+.teaser{font-size:15px;color:#C9C2B5;line-height:1.42;margin-top:10px}
+.foot{display:flex;align-items:center;gap:10px;margin-top:14px;font-family:var(--mono);font-size:11px;color:var(--steam)}
+.go{margin-left:auto;color:var(--c-oldfaithful);font-weight:600;letter-spacing:.04em}
+
+@keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}

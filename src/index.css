@@ -1,0 +1,47 @@
+:root{
+  --obsidian:#15120F;
+  --basalt:#211C18;
+  --basalt-2:#2A241F;
+  --sinter:#EDE7DB;
+  --steam:#9D9488;
+  --steam-dim:#6E665C;
+  --hairline:rgba(237,231,219,.10);
+  --hairline-2:rgba(237,231,219,.16);
+  /* thermal spectrum — hot center to cooler rim of a Yellowstone spring.
+     Kept as global tokens for the shared chrome; per-subject accents now
+     travel as literal hex inside each park's data file. */
+  --c-prismatic:#3F8FD0;
+  --c-oldfaithful:#E3A33C;
+  --c-norris:#BFCE52;
+  --c-mammoth:#D9C6A2;
+  --c-canyon:#CB5C39;
+  --c-lamar:#74A85E;
+  --c-hayden:#2FA294;
+  --c-caldera:#A074C8;
+  --display:'Bricolage Grotesque',system-ui,sans-serif;
+  --body:'Newsreader',Georgia,serif;
+  --mono:'JetBrains Mono',ui-monospace,monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{
+  background:var(--obsidian);
+  color:var(--sinter);
+  font-family:var(--body);
+  line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
+/* faint volcanic vignette + drifting steam */
+body::before{
+  content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:
+    radial-gradient(120% 80% at 50% -10%, rgba(63,143,208,.10), transparent 55%),
+    radial-gradient(100% 60% at 90% 110%, rgba(203,92,57,.08), transparent 60%);
+}
+
+a{color:inherit}
+
+@media(prefers-reduced-motion:reduce){
+  *{transition:none!important;animation:none!important}
+}

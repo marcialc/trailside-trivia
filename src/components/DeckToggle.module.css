@@ -1,0 +1,5 @@
+.browsebar{margin-top:8px}
+.segmented{display:inline-flex;gap:4px;padding:4px;background:var(--basalt);border:1px solid var(--hairline-2);border-radius:13px}
+.seg{font-family:var(--mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;border:none;background:transparent;color:var(--steam);padding:9px 16px;border-radius:9px;display:flex;align-items:center;gap:8px;transition:background .15s,color .15s}
+.on{background:var(--basalt-2);color:var(--sinter)}
+.sd{width:8px;height:8px;border-radius:50%}

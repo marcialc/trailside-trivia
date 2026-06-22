@@ -1,4 +1,5 @@
 import type { Deck } from '../data/types';
+import { useT } from '../i18n/t';
 import styles from './DeckToggle.module.css';
 
 interface Props {
@@ -8,6 +9,7 @@ interface Props {
 }
 
 export default function DeckToggle({ decks, activeDeckId, onChange }: Props) {
+  const tt = useT();
   return (
     <div className={styles.browsebar}>
       <div className={styles.segmented} role="tablist">
@@ -20,7 +22,7 @@ export default function DeckToggle({ decks, activeDeckId, onChange }: Props) {
             onClick={() => onChange(deck.id)}
           >
             <span className={styles.sd} style={{ background: deck.dotColor }} />
-            {deck.label}
+            {tt(deck.label)}
           </button>
         ))}
       </div>

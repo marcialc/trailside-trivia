@@ -1,4 +1,5 @@
 import { rankFor } from '../../lib/ranks';
+import { useUI } from '../../i18n/strings';
 import styles from './Quiz.module.css';
 
 interface Props {
@@ -9,8 +10,9 @@ interface Props {
 }
 
 export default function QuizResults({ score, total, onPlayAgain, onBackToMap }: Props) {
+  const ui = useUI();
   const pct = Math.round((score / total) * 100);
-  const rank = rankFor(pct);
+  const rank = ui.ranks[rankFor(pct)];
 
   return (
     <div className={styles.results}>
@@ -22,10 +24,10 @@ export default function QuizResults({ score, total, onPlayAgain, onBackToMap }: 
       <p className={styles.rsub}>{rank.message}</p>
       <div className={styles.qfoot}>
         <button className={styles.qbtn} onClick={onPlayAgain}>
-          Play again
+          {ui.playAgain}
         </button>
         <button className={`${styles.qbtn} ${styles.ghost}`} onClick={onBackToMap}>
-          Back to the map
+          {ui.backToMap}
         </button>
       </div>
     </div>

@@ -20,6 +20,9 @@
  *   • The FIRST deck is the default tab shown on load.
  *   • A deck needs at least one subject; quiz questions are optional but the
  *     "Trivia Challenge" round only has content for decks that supply some.
+ *   • Any user-facing text field accepts either a bare string (English-only)
+ *     or `{ en, es }` to translate it, e.g. name: { en: 'Bison', es: 'Bisonte' }.
+ *     Leaving it a plain string is fine — it just stays English until translated.
  * ─────────────────────────────────────────────────────────────────────────
  */
 

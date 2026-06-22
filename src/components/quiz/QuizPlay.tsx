@@ -1,4 +1,5 @@
 import type { PreparedQuestion } from './types';
+import { useUI } from '../../i18n/strings';
 import styles from './Quiz.module.css';
 
 const LETTERS = ['A', 'B', 'C', 'D'];
@@ -15,6 +16,7 @@ interface Props {
 }
 
 export default function QuizPlay({ item, total, idx, score, locked, selected, onAnswer, onNext }: Props) {
+  const ui = useUI();
   const isLast = idx + 1 === total;
   const correct = selected !== null && selected === item.a;
 
@@ -26,11 +28,9 @@ export default function QuizPlay({ item, total, idx, score, locked, selected, on
         ))}
       </div>
       <div className={styles.qmeta}>
-        <span>
-          Question {idx + 1} / {total}
-        </span>
+        <span>{ui.questionOf(idx + 1, total)}</span>
         <span className={styles.scorepill}>
-          Score <b>{score}</b>
+          {ui.score} <b>{score}</b>
         </span>
       </div>
       <div className={styles.qtext}>{item.q}</div>
@@ -52,13 +52,13 @@ export default function QuizPlay({ item, total, idx, score, locked, selected, on
       </div>
       {locked && (
         <div className={`${styles.explain} ${correct ? styles.ok : styles.no}`}>
-          <b>{correct ? 'Correct' : 'Not quite'}</b>
+          <b>{correct ? ui.correct : ui.notQuite}</b>
           {item.why}
         </div>
       )}
       <div className={styles.qfoot}>
         <button className={styles.qbtn} disabled={!locked} onClick={onNext}>
-          {isLast ? 'See results' : 'Next question'} →
+          {isLast ? ui.seeResults : ui.nextQuestion} →
         </button>
       </div>
     </>

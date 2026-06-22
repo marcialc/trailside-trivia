@@ -1,0 +1,11 @@
+.switcher{display:inline-flex;gap:6px}
+.opt{
+  font-family:var(--mono);font-size:13px;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;
+  background:var(--card);color:var(--pencil);border:2.5px solid var(--pencil);border-radius:var(--wobbly-pill);
+  box-shadow:var(--shadow);
+  padding:5px 11px;
+  transition:transform .1s,box-shadow .1s,background .1s,color .1s;
+}
+.opt:hover{transform:translate(2px,2px) rotate(1deg);box-shadow:2px 2px 0 0 var(--pencil)}
+.on{background:var(--accent);color:#fff}
+.on:hover{background:var(--accent)}

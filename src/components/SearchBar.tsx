@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import type { SearchMatch } from '../hooks/useSubjectSearch';
 import { highlight } from '../lib/highlight';
+import { useT } from '../i18n/t';
+import { useUI } from '../i18n/strings';
 import styles from './SearchBar.module.css';
 
 interface Props {
@@ -12,6 +14,8 @@ interface Props {
 }
 
 export default function SearchBar({ query, placeholder, matches, onChange, onSelect }: Props) {
+  const tt = useT();
+  const ui = useUI();
   const [open, setOpen] = useState(false);
   const [acIndex, setAcIndex] = useState(-1);
   const boxRef = useRef<HTMLDivElement>(null);
@@ -73,7 +77,7 @@ export default function SearchBar({ query, placeholder, matches, onChange, onSel
           placeholder={placeholder}
           autoComplete="off"
           spellCheck={false}
-          aria-label="Search this park's subjects and facts"
+          aria-label={ui.searchAria}
           aria-expanded={showAc}
           aria-controls="ac"
           onChange={(e) => {
@@ -88,7 +92,7 @@ export default function SearchBar({ query, placeholder, matches, onChange, onSel
         {query && (
           <button
             className={styles.clearbtn}
-            aria-label="Clear search"
+            aria-label={ui.clearSearch}
             onClick={() => {
               onChange('');
               setOpen(false);
@@ -112,7 +116,7 @@ export default function SearchBar({ query, placeholder, matches, onChange, onSel
             >
               <span className={styles.acDot} style={{ background: m.subject.accent }} />
               <div className={styles.acText}>
-                <div className={styles.acName}>{m.subject.name}</div>
+                <div className={styles.acName}>{tt(m.subject.name)}</div>
                 <div className={styles.acWhy}>
                   {highlight(m.why, query, (chunk, key) => (
                     <b key={key}>{chunk}</b>

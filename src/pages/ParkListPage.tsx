@@ -1,20 +1,29 @@
+import { useEffect } from 'react';
 import { Link, Navigate } from 'react-router-dom';
 import { PARKS } from '../data';
+import { useT } from '../i18n/t';
+import { useUI } from '../i18n/strings';
+import LanguageSwitcher from '../components/LanguageSwitcher';
 import styles from './ParkListPage.module.css';
 
 export default function ParkListPage() {
+  const tt = useT();
+  const ui = useUI();
+
+  useEffect(() => {
+    document.title = ui.listDocTitle;
+  }, [ui]);
+
   // With a single park, skip the landing page entirely.
   if (PARKS.length === 1) return <Navigate to={`/${PARKS[0].slug}`} replace />;
 
   return (
     <div className={styles.wrap}>
       <header className={styles.hero}>
-        <div className={styles.eyebrow}>Trailside Trivia · field guide</div>
-        <h1 className={styles.title}>National Parks</h1>
-        <p className={styles.lede}>
-          Pocket field guides to the parks — the stories, numbers, and oddities behind what you're looking at, plus a
-          trivia challenge for each.
-        </p>
+        <LanguageSwitcher />
+        <div className={styles.eyebrow}>{ui.listEyebrow}</div>
+        <h1 className={styles.title}>{ui.listTitle}</h1>
+        <p className={styles.lede}>{ui.listLede}</p>
       </header>
 
       <div className={styles.grid}>
@@ -28,15 +37,13 @@ export default function ParkListPage() {
                   <i key={i} style={{ background: c }} />
                 ))}
               </span>
-              <div className={styles.name}>{park.name}</div>
-              {park.region && <div className={styles.region}>{park.region}</div>}
-              <div className={styles.teaser}>{park.tagline}</div>
+              <div className={styles.name}>{tt(park.name)}</div>
+              {park.region && <div className={styles.region}>{tt(park.region)}</div>}
+              <div className={styles.teaser}>{tt(park.tagline)}</div>
               <div className={styles.foot}>
-                <span>
-                  {park.decks.length} {park.decks.length === 1 ? 'deck' : 'decks'}
-                </span>
-                <span>{subjectCount} subjects</span>
-                <span className={styles.go}>Open →</span>
+                <span>{ui.deckCount(park.decks.length)}</span>
+                <span>{ui.subjectCount(subjectCount)}</span>
+                <span className={styles.go}>{ui.open}</span>
               </div>
             </Link>
           );

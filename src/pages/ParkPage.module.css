@@ -1,9 +1,12 @@
 .wrap{position:relative;z-index:1;max-width:760px;margin:0 auto;padding:0 18px 80px}
 
+/* ---------- TOP BAR (back link + language switcher) ---------- */
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:22px}
+
 /* ---------- BACK LINK ---------- */
 .back{
   display:inline-flex;align-items:center;gap:6px;
-  margin:22px 2px 0;text-decoration:none;
+  margin:0 2px;text-decoration:none;
   font-family:var(--mono);font-size:13px;letter-spacing:.12em;text-transform:uppercase;
   color:var(--pencil-soft);transition:color .12s;
 }

@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import type { Park } from '../../data/types';
 import { shuffle } from '../../lib/shuffle';
+import { useT } from '../../i18n/t';
+import { useUI } from '../../i18n/strings';
 import type { PreparedQuestion } from './types';
 import QuizSetup from './QuizSetup';
 import QuizPlay from './QuizPlay';
@@ -18,6 +20,8 @@ interface Props {
 const FALLBACK_ACCENT = 'var(--c-oldfaithful)';
 
 export default function QuizOverlay({ park, open, onClose }: Props) {
+  const tt = useT();
+  const ui = useUI();
   const decks = park.decks;
   const [phase, setPhase] = useState<Phase>('setup');
   const [deckId, setDeckId] = useState(decks[0].id);
@@ -30,7 +34,10 @@ export default function QuizOverlay({ park, open, onClose }: Props) {
   const lastFocus = useRef<HTMLElement | null>(null);
 
   const deck = decks.find((d) => d.id === deckId) ?? decks[0];
-  const subjectName = (id: string) => deck.subjects.find((s) => s.id === id)?.name ?? park.name;
+  const subjectName = (id: string) => {
+    const s = deck.subjects.find((s) => s.id === id);
+    return s ? tt(s.name) : tt(park.name);
+  };
   const subjectAccent = (id: string) => deck.subjects.find((s) => s.id === id)?.accent ?? FALLBACK_ACCENT;
 
   // open/close: reset to setup, lock scroll, manage focus
@@ -62,8 +69,14 @@ export default function QuizOverlay({ park, open, onClose }: Props) {
     const chosen =
       scope === 'all' ? shuffle(bank).slice(0, 10) : shuffle(bank.filter((q) => q.subjectId === scope));
     const prepared: PreparedQuestion[] = chosen.map((q) => {
-      const order = shuffle(q.opts.map((t, i) => ({ t, correct: i === q.a })));
-      return { subjectId: q.subjectId, q: q.q, why: q.why, opts: order, a: order.findIndex((o) => o.correct) };
+      const order = shuffle(q.opts.map((opt, i) => ({ t: tt(opt), correct: i === q.a })));
+      return {
+        subjectId: q.subjectId,
+        q: tt(q.q),
+        why: tt(q.why),
+        opts: order,
+        a: order.findIndex((o) => o.correct),
+      };
     });
     setPool(prepared);
     setIdx(0);
@@ -96,13 +109,13 @@ export default function QuizOverlay({ park, open, onClose }: Props) {
   }
 
   const item = pool[idx];
-  let kicker = 'Trivia Challenge';
+  let kicker = ui.triviaChallenge;
   let accent = FALLBACK_ACCENT;
   if (phase === 'play' && item) {
     kicker = subjectName(item.subjectId);
     accent = subjectAccent(item.subjectId);
   } else if (phase === 'results') {
-    kicker = 'Round complete';
+    kicker = ui.roundComplete;
   }
 
   return (
@@ -110,13 +123,13 @@ export default function QuizOverlay({ park, open, onClose }: Props) {
       className={`${styles.quiz} ${open ? styles.open : ''}`}
       role="dialog"
       aria-modal="true"
-      aria-label="Trivia challenge"
+      aria-label={ui.quizAria}
       aria-hidden={!open}
     >
       <div className={styles.inner} style={{ '--accent': accent } as React.CSSProperties}>
         <div className={styles.top}>
           <span className={styles.kicker}>{kicker}</span>
-          <button className={styles.qx} aria-label="Close quiz" onClick={onClose}>
+          <button className={styles.qx} aria-label={ui.closeQuiz} onClick={onClose}>
             ×
           </button>
         </div>

@@ -1,5 +1,6 @@
 .wrap{position:relative;z-index:1;max-width:760px;margin:0 auto;padding:0 18px 80px}
 .hero{padding:34px 2px 18px}
+.logo{display:block;width:84px;height:84px;margin:0 0 4px -6px;transform:rotate(-3deg)}
 .eyebrow{font-family:var(--mono);font-size:14px;letter-spacing:.16em;text-transform:uppercase;color:var(--pencil-soft)}
 .title{
   font-family:var(--display);font-weight:700;font-size:clamp(42px,13vw,68px);

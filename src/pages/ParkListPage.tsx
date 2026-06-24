@@ -21,6 +21,7 @@ export default function ParkListPage() {
     <div className={styles.wrap}>
       <header className={styles.hero}>
         <LanguageSwitcher />
+        <img className={styles.logo} src="/favicon.svg" alt="" aria-hidden="true" />
         <div className={styles.eyebrow}>{ui.listEyebrow}</div>
         <h1 className={styles.title}>{ui.listTitle}</h1>
         <p className={styles.lede}>{ui.listLede}</p>

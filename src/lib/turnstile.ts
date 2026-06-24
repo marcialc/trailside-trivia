@@ -1,8 +1,7 @@
 // Thin loader + typings for Cloudflare Turnstile (the bot check on the
-// "Request a park" form). The site key is public and injected at build time via
-// VITE_TURNSTILE_SITE_KEY; when it's unset the form treats requests as disabled.
-
-export const TURNSTILE_SITE_KEY: string | undefined = import.meta.env.VITE_TURNSTILE_SITE_KEY;
+// "Request a park" form). The site key is public (it ships in the browser and
+// is paired with the server-side TURNSTILE_SECRET), so it's fine to hardcode.
+export const TURNSTILE_SITE_KEY = '0x4AAAAAADqjEpsoo1749jL8';
 
 interface TurnstileRenderOptions {
   sitekey: string;

@@ -11,6 +11,14 @@
   "assets": {
     "binding": "ASSETS",
     "not_found_handling": "single-page-application"
+  },
+  // Workers Logs: capture console output + per-invocation logs (view in the
+  // dashboard or `wrangler tail`). Takes effect on the next deploy.
+  "observability": {
+    "logs": {
+      "enabled": true,
+      "invocation_logs": true
+    }
   }
   // Global high-score board (optional): create the namespace, then uncomment.
   //   wrangler kv namespace create SCORES

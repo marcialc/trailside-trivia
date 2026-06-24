@@ -66,6 +66,13 @@ export default function ParkPage() {
   const band = activeDeck.subjects.slice(0, 5).map((s) => s.accent);
   const countWord = tt(activeDeck.label).toLowerCase();
 
+  // When there are multiple decks the grid is the panel the deck tabs control;
+  // wire up the tab/tabpanel relationship for assistive tech.
+  const multiDeck = park.decks.length > 1;
+  const panelProps = multiDeck
+    ? ({ role: 'tabpanel', id: 'deck-panel', 'aria-labelledby': `tab-${activeDeck.id}`, tabIndex: 0 } as const)
+    : {};
+
   return (
     <div className={styles.wrap}>
       <div className={styles.topbar}>
@@ -111,13 +118,13 @@ export default function ParkPage() {
       )}
 
       <div className={styles.rowmeta}>
-        <span>
+        <span aria-live="polite">
           <span className={styles.count}>{filtered.length}</span> {countWord}
         </span>
         <span>{ui.tapForFile}</span>
       </div>
 
-      <div className={styles.grid}>
+      <div className={styles.grid} {...panelProps}>
         {filtered.map((subject, i) => (
           <SubjectCard key={subject.id} subject={subject} index={i} onOpen={(id) => openSheet(id)} />
         ))}

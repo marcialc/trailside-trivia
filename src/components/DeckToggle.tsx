@@ -16,8 +16,11 @@ export default function DeckToggle({ decks, activeDeckId, onChange }: Props) {
         {decks.map((deck) => (
           <button
             key={deck.id}
+            id={`tab-${deck.id}`}
             role="tab"
             aria-selected={deck.id === activeDeckId}
+            aria-controls="deck-panel"
+            tabIndex={deck.id === activeDeckId ? 0 : -1}
             className={`${styles.seg} ${deck.id === activeDeckId ? styles.on : ''}`}
             onClick={() => onChange(deck.id)}
           >

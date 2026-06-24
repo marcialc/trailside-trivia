@@ -1,3 +1,4 @@
+import type { BestEntry } from '../../lib/highScores';
 import { rankFor } from '../../lib/ranks';
 import { useUI } from '../../i18n/strings';
 import styles from './Quiz.module.css';
@@ -5,13 +6,15 @@ import styles from './Quiz.module.css';
 interface Props {
   score: number;
   total: number;
+  best: BestEntry | null;
+  isNewBest: boolean;
   onPlayAgain: () => void;
   onBackToMap: () => void;
 }
 
-export default function QuizResults({ score, total, onPlayAgain, onBackToMap }: Props) {
+export default function QuizResults({ score, total, best, isNewBest, onPlayAgain, onBackToMap }: Props) {
   const ui = useUI();
-  const pct = Math.round((score / total) * 100);
+  const pct = total > 0 ? Math.round((score / total) * 100) : 0;
   const rank = ui.ranks[rankFor(pct)];
 
   return (
@@ -22,6 +25,11 @@ export default function QuizResults({ score, total, onPlayAgain, onBackToMap }: 
       </div>
       <div className={styles.rank}>{rank.title}</div>
       <p className={styles.rsub}>{rank.message}</p>
+      {isNewBest ? (
+        <p className={styles.best}>{ui.newBest}</p>
+      ) : (
+        best && <p className={styles.best}>{ui.yourBest(best.score, best.total)}</p>
+      )}
       <div className={styles.qfoot}>
         <button className={styles.qbtn} onClick={onPlayAgain}>
           {ui.playAgain}

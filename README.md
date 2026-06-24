@@ -7,7 +7,7 @@ Search a spot or tap a card to pull up its field notes. Test yourself with shuff
 **🔗 Live demo: [trailside-trivia.marcialandres06.workers.dev](https://trailside-trivia.marcialandres06.workers.dev/)**
 
 <p align="center">
-  <em>Dark "obsidian / thermal" aesthetic · Bricolage Grotesque · Newsreader · JetBrains Mono</em>
+  <em>Hand-drawn "field notebook" aesthetic — warm paper, wobbly borders, cut-paper shadows · Kalam · Patrick Hand</em>
 </p>
 
 ---
@@ -18,7 +18,7 @@ Search a spot or tap a card to pull up its field notes. Test yourself with shuff
 - 🗂️ **Deck toggle** — segmented control to switch between collections (Places / Animals / Plants / anything).
 - 📇 **Subject cards → detail sheet** — tap a card for a bottom-sheet of numbered, tagged facts, with your search term highlighted. Focus-managed, scroll-locked, keyboard-dismissible.
 - 🧠 **Trivia challenge** — a `setup → play → results` quiz: pick a deck, pick a round (everything, or a single subject), get instant feedback and an explanation after every question, then a **ranger rank** based on your score.
-- 🌗 **Faithful design** — hand-rolled CSS lifted from the original prototype; honors `prefers-reduced-motion`.
+- 🌗 **Faithful design** — hand-rolled CSS in a hand-drawn field-notebook style; honors `prefers-reduced-motion`.
 - ⚡ **Edge-deployed** — ships as a static SPA on Cloudflare Workers with deep-link fallback.
 - 🧩 **100% data-driven** — no park names, deck names, or subject IDs are hardcoded anywhere in the components.
 
@@ -113,7 +113,7 @@ export const PARKS: Park[] = [yellowstone, saguaro, yourPark];
 
 That's it. No component edits.
 
-> The repo ships with **Yellowstone** (8 places + 8 animals, fully fact-checked) and a deliberately tiny **Saguaro** park (one deck, two subjects) that exists purely to prove the pipeline. With a single park in the registry, the landing page redirects straight to it.
+> The repo ships with **Yellowstone** and **Glacier** (8 places + 8 animals each, fully translated EN/ES) and a deliberately tiny **Saguaro** park (one deck, two subjects) that exists purely to prove the pipeline. With a single park in the registry, the landing page redirects straight to it.
 
 ---
 
@@ -137,13 +137,13 @@ See [`src/data/types.ts`](src/data/types.ts) for the source of truth.
 ├─ index.html
 ├─ vite.config.ts
 ├─ wrangler.jsonc            # Workers config (SPA fallback)
-├─ worker/index.ts           # optional API stub for a future scores endpoint (not wired in v1)
+├─ worker/index.ts           # optional /api/scores Worker for the global high-score board
 └─ src/
    ├─ main.tsx · App.tsx     # entry + router
    ├─ index.css              # global tokens + base styles
    ├─ data/                  # ← all content lives here
    │  ├─ types.ts · index.ts
-   │  └─ parks/              # yellowstone.ts · saguaro.ts · _TEMPLATE.ts
+   │  └─ parks/              # yellowstone.ts · glacier.ts · saguaro.ts · _TEMPLATE.ts
    ├─ pages/                 # ParkListPage · ParkPage
    ├─ components/            # SearchBar · DeckToggle · SubjectCard · DetailSheet · quiz/
    ├─ hooks/                 # useSubjectSearch
@@ -160,9 +160,17 @@ The app deploys as static assets on Cloudflare Workers. `wrangler.jsonc` sets `a
 npm run deploy
 ```
 
-### Future API (stubbed)
+### High scores
 
-`worker/index.ts` leaves a clean seam: serve `env.ASSETS.fetch(request)` for everything except `/api/*`, backed by a KV namespace for a global high-score board. Uncomment the `main` and `kv_namespaces` lines in `wrangler.jsonc` when you're ready. Local-only high scores can use `localStorage` first.
+Personal best scores work out of the box — they're stored per (park, deck, round) in the browser's `localStorage` (`src/lib/highScores.ts`) and shown on the quiz results screen.
+
+For a **shared, cross-device board**, `worker/index.ts` implements `GET`/`POST` `/api/scores` backed by Cloudflare KV (everything else falls through to the static assets). It's already pointed to by `main` in `wrangler.jsonc`; until a KV namespace is bound it answers as "disabled" and the client stays on local-only scores. To turn it on:
+
+```bash
+wrangler kv namespace create SCORES
+# paste the printed id into the kv_namespaces line in wrangler.jsonc, uncomment it
+npm run deploy
+```
 
 ---
 

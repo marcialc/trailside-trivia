@@ -1,0 +1,62 @@
+<svg viewBox="0 0 600 600" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Pine tree and snow-capped mountain sticker">
+  <defs>
+    <filter id="shadowBlur" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="4.5"/>
+    </filter>
+    <filter id="rough" x="-8%" y="-8%" width="116%" height="116%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.015" numOctaves="2" seed="7" result="n"/>
+      <feDisplacementMap in="SourceGraphic" in2="n" scale="2.8" xChannelSelector="R" yChannelSelector="G"/>
+    </filter>
+
+    <path id="sil-mountain" d="M 296 380 L 352 246 L 388 292 L 410 270 L 458 376 Z"/>
+
+    <path id="sil-tree" d="M 243 150
+      C 250 180 258 210 277 236
+      L 261 226
+      C 270 262 282 292 301 320
+      L 277 310
+      C 288 352 306 384 335 412
+      C 312 420 286 420 266 418
+      L 266 480 L 220 480 L 221 418
+      C 200 420 174 420 151 412
+      C 178 384 196 352 209 310
+      L 185 320
+      C 204 292 216 262 225 226
+      L 209 236
+      C 228 210 236 180 243 150 Z"/>
+  </defs>
+
+  <!-- soft drop shadow -->
+  <g transform="translate(9,15)" filter="url(#shadowBlur)" fill="#3c3a36" stroke="#3c3a36" stroke-width="26" stroke-linejoin="round" stroke-linecap="round" opacity="0.5">
+    <use href="#sil-mountain"/>
+    <use href="#sil-tree"/>
+  </g>
+
+  <!-- white die-cut border -->
+  <g fill="#FBF8F1" stroke="#FBF8F1" stroke-width="26" stroke-linejoin="round" stroke-linecap="round">
+    <use href="#sil-mountain"/>
+    <use href="#sil-tree"/>
+  </g>
+
+  <!-- inked artwork with hand-drawn wobble -->
+  <g filter="url(#rough)">
+    <use href="#sil-mountain" fill="#EAA23C"/>
+    <path d="M 332 286 L 352 246 L 374 292 L 363 281 L 354 292 L 344 279 Z" fill="#FBF8F1"/>
+    <use href="#sil-mountain" fill="none" stroke="#2b2926" stroke-width="5" stroke-linejoin="round"/>
+    <path d="M 332 286 L 352 246 L 374 292 L 363 281 L 354 292 L 344 279 L 332 286" fill="none" stroke="#2b2926" stroke-width="3.5" stroke-linejoin="round" stroke-linecap="round"/>
+
+    <path d="M 250 426 L 251 466" stroke="#2b2926" stroke-width="4" stroke-linecap="round"/>
+    <path d="M 251 430 L 286 440 L 251 452 Z" fill="#E0402E" stroke="#2b2926" stroke-width="4" stroke-linejoin="round"/>
+
+    <use href="#sil-tree" fill="#4E7C44"/>
+    <use href="#sil-tree" fill="none" stroke="#2b2926" stroke-width="5.5" stroke-linejoin="round" stroke-linecap="round"/>
+    <path d="M 231 420 L 233 478 M 254 420 L 255 478" fill="none" stroke="#2b2926" stroke-width="3.2" stroke-linecap="round"/>
+    <g stroke="#2b2926" stroke-width="2.6" stroke-linecap="round" fill="none" opacity="0.8">
+      <path d="M 243 196 l -13 9 M 245 200 l 12 8"/>
+      <path d="M 228 250 l -15 10 M 258 252 l 15 9"/>
+      <path d="M 245 270 l -12 8"/>
+      <path d="M 214 330 l -17 11 M 272 332 l 17 11"/>
+      <path d="M 248 350 l -14 9"/>
+    </g>
+  </g>
+</svg>

@@ -49,6 +49,7 @@ jobs:
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           CF_AIG_TOKEN: ${{ secrets.CF_AIG_TOKEN }}
+          CF_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
           CF_ACCOUNT_ID: ${{ vars.CF_ACCOUNT_ID }}
           CF_AI_GATEWAY: ${{ vars.CF_AI_GATEWAY }}
           ISSUE_BODY: ${{ github.event.issue.body }}

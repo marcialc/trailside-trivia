@@ -125,17 +125,18 @@ Anyone can request a park by opening the **🏞️ Park request** issue. When a 
 draft → type-check → review loop (fact-check) → translate (es) → type-check → register in PARKS → build + test + lint → open PR
 ```
 
-Each AI step calls **Claude Opus 4.8** (`anthropic/claude-opus-4-8`) through a **Cloudflare AI Gateway**, via its OpenAI-compatible `/compat/chat/completions` endpoint (for caching, rate-limiting, and cost analytics). Auth goes through the gateway: with **stored keys (BYOK)** the Anthropic key lives in Cloudflare and requests only send the gateway token — no Anthropic key in CI. The deterministic gates — `typecheck`, `build`, `test`, `lint` — are the real safety net: the model never decides whether the result compiles. The pipeline opens a pull request labeled `needs-fact-check` and **never auto-merges** — a human verifies the cited facts and merges.
+Each AI step calls a model through a **Cloudflare AI Gateway** (for caching, rate-limiting, and cost analytics), defaulting to **`google/gemini-3.5-flash`**. The client routes by model: `google/*` partner models go through Workers AI `/ai/run` (account-billed via a Cloudflare token), while `anthropic/*` and `openai/*` models go through the OpenAI-compatible `/compat/chat/completions` endpoint. Set `PARK_MODEL` to override the model. The deterministic gates — `typecheck`, `build`, `test`, `lint` — are the real safety net: the model never decides whether the result compiles. The pipeline opens a pull request labeled `needs-fact-check` and **never auto-merges** — a human verifies the cited facts and merges.
 
 **Setup** (one-time, in repo settings):
 
 | Kind | Name | Value |
 | --- | --- | --- |
-| Secret | `CF_AIG_TOKEN` | AI Gateway token (gateway holds the Anthropic key via stored keys) |
+| Secret | `CF_AIG_TOKEN` | AI Gateway token (compat path; gateway can hold provider keys via stored keys) |
+| Secret | `CF_API_TOKEN` | Cloudflare token with Workers AI access for the `/ai/run` partner path (falls back to `CF_AIG_TOKEN` if unset) |
 | Variable | `CF_ACCOUNT_ID` | Cloudflare account id |
 | Variable | `CF_AI_GATEWAY` | AI Gateway name |
 
-> Not using stored keys? Set a `ANTHROPIC_API_KEY` secret instead (or in addition) and the request will send it directly through the gateway.
+> Using an `anthropic/*` model without gateway stored keys? Set an `ANTHROPIC_API_KEY` secret and the request will send it directly through the gateway.
 
 Run it manually for testing via **Actions → Add park → Run workflow** (or locally with the same env vars: `npm run park:generate` with `PARK_NAME=...`).
 

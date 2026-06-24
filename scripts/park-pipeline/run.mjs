@@ -139,6 +139,7 @@ Hard requirements:
 - \`slug\` must be exactly "${slug}".
 - Each Subject.id is unique within this park, kebab-case. Each QuizQuestion.subjectId must match a Subject.id in the SAME deck. \`a\` is the 0-based index of the correct option.
 - Every fact must be accurate and verifiable. Add a trailing \`// source: <authority>\` comment on each fact's line citing NPS, USGS, or a comparably authoritative source. Do not invent figures.
+- Every color field (\`Subject.accent\`, \`Deck.dotColor\`) MUST be a plain hex string literal like '#9A7B4C'. Never construct a color with runtime expressions, method calls, template strings, escapes, or non-ASCII digits (e.g. no \`.replace(...)\`, no Devanagari/other Unicode digits).
 - Match the depth of the reference park: roughly 6-8 subjects per deck and a quiz bank covering them.`;
 
 const FIX_SYS = 'You fix TypeScript so it conforms to the Park type and compiles under strict mode. Return only the corrected file in a single ```ts code block.';
@@ -258,14 +259,13 @@ for (const cmd of ['npm run build', 'npm test', 'npm run lint']) {
 }
 
 const { inputTokens, outputTokens } = usage();
-const cost = (inputTokens / 1e6) * 5 + (outputTokens / 1e6) * 25; // Opus 4.8 $5/$25 per MTok
 
 const summary = `## 🏞️ Generated park: ${parkName}
 
 - **File:** \`src/data/parks/${slug}.ts\` (export \`${exportName}\`)
 - **Route:** \`/${slug}\`
 - **Model:** \`${MODEL}\` via Cloudflare AI Gateway
-- **Tokens:** ${inputTokens.toLocaleString()} in / ${outputTokens.toLocaleString()} out (~$${cost.toFixed(2)})
+- **Tokens:** ${inputTokens.toLocaleString()} in / ${outputTokens.toLocaleString()} out
 - **Gates:** type-check, build, test, lint all passed
 ${reviewed.unresolved ? '\n> ⚠️ **Automated review left issues open — verify facts carefully before merging.**' : ''}
 ${reviewed.notes.length ? `\n<details><summary>Review notes</summary>\n\n${reviewed.notes.map((n) => `- ${n}`).join('\n')}\n</details>` : ''}

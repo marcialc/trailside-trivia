@@ -29,7 +29,7 @@ The data hierarchy (`src/data/types.ts`) is `Park → Deck[] → Subject[] / Qui
 - `Subject.accent` is a literal hex color so each park file is self-contained and portable.
 - The **first deck** in `Park.decks` is the default tab.
 
-Adding a park must require exactly two edits: create `src/data/parks/<slug>.ts` and add it to the `PARKS` array in `src/data/index.ts`. `src/data/parks/_TEMPLATE.ts` is the canonical shape to copy. `saguaro.ts` is a deliberately minimal park (one deck, two subjects) that exists to prove the pipeline — keep it minimal. When adding features, verify they work for *any* park, not just Yellowstone.
+Adding a park must require exactly two edits: create `src/data/parks/<slug>.ts` and add it to the `PARKS` array in `src/data/index.ts`. `src/data/parks/_TEMPLATE.ts` is the canonical shape to copy. When adding features, verify they work for *any* park, not just Yellowstone.
 
 ### Routing (`src/App.tsx`)
 

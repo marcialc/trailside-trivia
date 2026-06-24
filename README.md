@@ -108,12 +108,12 @@ export const yourPark: Park = {
 ```ts
 import { yourPark } from './parks/your-slug';
 
-export const PARKS: Park[] = [yellowstone, saguaro, yourPark];
+export const PARKS: Park[] = [yellowstone, glacier, yourPark];
 ```
 
 That's it. No component edits.
 
-> The repo ships with **Yellowstone** and **Glacier** (8 places + 8 animals each, fully translated EN/ES) and a deliberately tiny **Saguaro** park (one deck, two subjects) that exists purely to prove the pipeline. With a single park in the registry, the landing page redirects straight to it.
+> The repo ships with **Yellowstone** and **Glacier** (8 places + 8 animals each, fully translated EN/ES). With a single park in the registry, the landing page redirects straight to it.
 
 ---
 
@@ -143,7 +143,7 @@ See [`src/data/types.ts`](src/data/types.ts) for the source of truth.
    ├─ index.css              # global tokens + base styles
    ├─ data/                  # ← all content lives here
    │  ├─ types.ts · index.ts
-   │  └─ parks/              # yellowstone.ts · glacier.ts · saguaro.ts · _TEMPLATE.ts
+   │  └─ parks/              # yellowstone.ts · glacier.ts · _TEMPLATE.ts
    ├─ pages/                 # ParkListPage · ParkPage
    ├─ components/            # SearchBar · DeckToggle · SubjectCard · DetailSheet · quiz/
    ├─ hooks/                 # useSubjectSearch

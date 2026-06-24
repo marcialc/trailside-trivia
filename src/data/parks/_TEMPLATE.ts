@@ -7,7 +7,7 @@
  *  3. Add it to the PARKS array in src/data/index.ts:
  *
  *         import { yourPark } from './parks/your-slug';
- *         export const PARKS = [yellowstone, saguaro, yourPark];
+ *         export const PARKS = [yellowstone, glacier, yourPark];
  *
  *  That's it. Routing, the landing page, search/autocomplete, the deck toggle,
  *  cards, the detail sheet, and the quiz all work automatically — no component

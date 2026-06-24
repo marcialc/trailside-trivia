@@ -1,41 +1,39 @@
-// Minimal client for Cloudflare AI Gateway's OpenAI-compatible endpoint.
+// Client for Cloudflare AI Gateway. Two request paths:
+//   - compat (`/compat/chat/completions`, OpenAI `messages`): anthropic / openai /
+//     workers-ai/* — third-party ones need keys stored in the gateway (BYOK).
+//   - Workers AI `/ai/run` (Gemini-native `contents`): `google/*` partner models,
+//     account-billed via your CF token, gateway attached for logging.
 //
-//   https://gateway.ai.cloudflare.com/v1/<account>/<gateway>/compat/chat/completions
-//
-// This is the unified `/compat/chat/completions` API (OpenAI chat shape), so the
-// model is given as `anthropic/<model>`, the system prompt is a message with
-// role "system", and streaming deltas arrive as `choices[].delta.content`.
-//
-// Auth modes (we support both):
-//   - Stored keys / BYOK (default): the gateway holds the Anthropic key — send
-//     only `cf-aig-authorization: Bearer <CF_AIG_TOKEN>`.
-//   - Provider key: additionally send `Authorization: Bearer <ANTHROPIC_API_KEY>`.
+// Default model is `google/gemini-3.5-flash`, chosen via the model bake-off:
+// best-quality output of the field at ~60% of Opus's cost. See
+// bakeoff.local/comparison.md for the full evaluation.
 //
 // Env:
 //   CF_ACCOUNT_ID   (required) — Cloudflare account id
 //   CF_AI_GATEWAY   (required) — AI Gateway name/id
-//   CF_AIG_TOKEN    — gateway token (required for stored keys / authenticated gateways)
-//   ANTHROPIC_API_KEY — only if NOT using gateway stored keys
-//   PARK_MODEL      (optional) — model id; defaults to claude-opus-4-8
+//   CF_AIG_TOKEN    — gateway token (compat path); also the /ai/run fallback token
+//   CF_API_TOKEN    — CF token with Workers AI access for /ai/run; defaults to CF_AIG_TOKEN
+//   ANTHROPIC_API_KEY — only if using a compat `anthropic/*` model without gateway stored keys
+//   PARK_MODEL      (optional) — override model id; defaults to google/gemini-3.5-flash
 
-const { ANTHROPIC_API_KEY, CF_ACCOUNT_ID, CF_AI_GATEWAY, CF_AIG_TOKEN, PARK_MODEL } = process.env;
+const { ANTHROPIC_API_KEY, CF_ACCOUNT_ID, CF_AI_GATEWAY, CF_AIG_TOKEN, CF_API_TOKEN, PARK_MODEL } = process.env;
 
 for (const [name, value] of Object.entries({ CF_ACCOUNT_ID, CF_AI_GATEWAY })) {
   if (!value) throw new Error(`Missing required env var: ${name}`);
 }
-if (!CF_AIG_TOKEN && !ANTHROPIC_API_KEY) {
+
+const baseModel = PARK_MODEL || 'google/gemini-3.5-flash';
+export const MODEL = baseModel.includes('/') ? baseModel : `anthropic/${baseModel}`;
+
+const isPartner = MODEL.startsWith('google/');
+const runToken = CF_API_TOKEN || CF_AIG_TOKEN;
+
+if (isPartner) {
+  if (!runToken) throw new Error('Set CF_API_TOKEN or CF_AIG_TOKEN for the /ai/run partner path.');
+} else if (!CF_AIG_TOKEN && !ANTHROPIC_API_KEY) {
   throw new Error('Set CF_AIG_TOKEN (AI Gateway stored keys) or ANTHROPIC_API_KEY.');
 }
 
-const baseModel = PARK_MODEL || 'claude-opus-4-8';
-export const MODEL = baseModel.includes('/') ? baseModel : `anthropic/${baseModel}`;
-
-const ENDPOINT = `https://gateway.ai.cloudflare.com/v1/${CF_ACCOUNT_ID}/${CF_AI_GATEWAY}/compat/chat/completions`;
-const HEADERS = {
-  'content-type': 'application/json',
-  ...(CF_AIG_TOKEN ? { 'cf-aig-authorization': `Bearer ${CF_AIG_TOKEN}` } : {}),
-  ...(ANTHROPIC_API_KEY ? { authorization: `Bearer ${ANTHROPIC_API_KEY}` } : {}),
-};
 const TIMEOUT_MS = 15 * 60 * 1000;
 
 let inputTokens = 0;
@@ -46,11 +44,17 @@ export function usage() {
   return { inputTokens, outputTokens };
 }
 
-/**
- * Send one prompt and return the concatenated text response. Streams so large
- * outputs aren't truncated by a request timeout.
- */
-export async function ask({ system, user, maxTokens = 32000 }) {
+// ---------------------------------------------------------------------------
+// compat path: /compat/chat/completions, OpenAI message shape, streamed.
+// ---------------------------------------------------------------------------
+const COMPAT_ENDPOINT = `https://gateway.ai.cloudflare.com/v1/${CF_ACCOUNT_ID}/${CF_AI_GATEWAY}/compat/chat/completions`;
+const COMPAT_HEADERS = {
+  'content-type': 'application/json',
+  ...(CF_AIG_TOKEN ? { 'cf-aig-authorization': `Bearer ${CF_AIG_TOKEN}` } : {}),
+  ...(ANTHROPIC_API_KEY ? { authorization: `Bearer ${ANTHROPIC_API_KEY}` } : {}),
+};
+
+async function askCompat({ system, user, maxTokens }) {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), TIMEOUT_MS);
   try {
@@ -58,13 +62,14 @@ export async function ask({ system, user, maxTokens = 32000 }) {
     if (system) messages.push({ role: 'system', content: system });
     messages.push({ role: 'user', content: user });
 
-    const res = await fetch(ENDPOINT, {
+    const res = await fetch(COMPAT_ENDPOINT, {
       method: 'POST',
-      headers: HEADERS,
+      headers: COMPAT_HEADERS,
       signal: controller.signal,
       body: JSON.stringify({
         model: MODEL,
-        max_tokens: maxTokens,
+        // GPT-5 / o-series require max_completion_tokens instead of max_tokens.
+        ...(MODEL.startsWith('openai/') ? { max_completion_tokens: maxTokens } : { max_tokens: maxTokens }),
         stream: true,
         stream_options: { include_usage: true },
         messages,
@@ -108,4 +113,60 @@ export async function ask({ system, user, maxTokens = 32000 }) {
   } finally {
     clearTimeout(timer);
   }
+}
+
+// ---------------------------------------------------------------------------
+// partner path: Workers AI /ai/run, Gemini-native contents (system folded in).
+// ---------------------------------------------------------------------------
+const RUN_ENDPOINT = `https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/ai/run`;
+const RUN_HEADERS = {
+  'content-type': 'application/json',
+  authorization: `Bearer ${runToken}`,
+  'cf-aig-gateway-id': CF_AI_GATEWAY,
+};
+
+async function askPartner({ system, user, maxTokens }) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), TIMEOUT_MS);
+  try {
+    const text = (system ? `${system}\n\n` : '') + user;
+    const res = await fetch(RUN_ENDPOINT, {
+      method: 'POST',
+      headers: RUN_HEADERS,
+      signal: controller.signal,
+      body: JSON.stringify({
+        model: MODEL,
+        input: {
+          contents: [{ role: 'user', parts: [{ text }] }],
+          generationConfig: { maxOutputTokens: maxTokens },
+        },
+      }),
+    });
+    const json = await res.json().catch(() => ({}));
+    if (!res.ok || json.success === false) {
+      throw new Error(`AI /ai/run failed (${res.status}): ${JSON.stringify(json.errors || json).slice(0, 500)}`);
+    }
+    const r = json.result ?? json;
+    const out =
+      r?.candidates?.[0]?.content?.parts?.map((p) => p?.text || '').join('') ||
+      (typeof r?.response === 'string' ? r.response : '') ||
+      '';
+    const u = r?.usageMetadata || r?.usage || {};
+    inputTokens += u.promptTokenCount ?? u.prompt_tokens ?? 0;
+    outputTokens += u.candidatesTokenCount ?? u.completion_tokens ?? 0;
+    if (!out) throw new Error(`Empty response from ${MODEL}: ${JSON.stringify(json).slice(0, 300)}`);
+    return out;
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+/**
+ * Send one prompt and return the response text. Routes by model: `google/*`
+ * (and other partners) go through /ai/run; everything else streams via compat.
+ */
+export async function ask({ system, user, maxTokens = 32000 }) {
+  return isPartner
+    ? askPartner({ system, user, maxTokens })
+    : askCompat({ system, user, maxTokens });
 }

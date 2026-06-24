@@ -6,7 +6,7 @@ chat for accuracy), replace `{{PARK NAME}}` with the park you want, and paste th
 
 ```ts
 import { yourPark } from './parks/your-slug';
-export const PARKS: Park[] = [yellowstone, saguaro, yourPark];
+export const PARKS: Park[] = [yellowstone, glacier, yourPark];
 ```
 
 Run `npm run build` afterward — strict TypeScript will flag any shape mistakes.

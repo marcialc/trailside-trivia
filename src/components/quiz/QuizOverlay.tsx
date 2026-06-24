@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import type { Park } from '../../data/types';
 import { shuffle } from '../../lib/shuffle';
+import { recordRound, type RecordResult } from '../../lib/highScores';
 import { useT } from '../../i18n/t';
 import { useUI } from '../../i18n/strings';
 import type { PreparedQuestion } from './types';
@@ -19,18 +20,25 @@ interface Props {
 
 const FALLBACK_ACCENT = 'var(--c-oldfaithful)';
 
+// First deck that actually has questions — the quiz should never default to a
+// deck with an empty bank. Falls back to the first deck if none have a quiz.
+function firstQuizDeckId(park: Park): string {
+  return (park.decks.find((d) => d.quiz.length > 0) ?? park.decks[0]).id;
+}
+
 export default function QuizOverlay({ park, open, onClose }: Props) {
   const tt = useT();
   const ui = useUI();
   const decks = park.decks;
   const [phase, setPhase] = useState<Phase>('setup');
-  const [deckId, setDeckId] = useState(decks[0].id);
+  const [deckId, setDeckId] = useState(() => firstQuizDeckId(park));
   const [scope, setScope] = useState('all');
   const [pool, setPool] = useState<PreparedQuestion[]>([]);
   const [idx, setIdx] = useState(0);
   const [score, setScore] = useState(0);
   const [locked, setLocked] = useState(false);
   const [selected, setSelected] = useState<number | null>(null);
+  const [result, setResult] = useState<RecordResult | null>(null);
   const lastFocus = useRef<HTMLElement | null>(null);
 
   const deck = decks.find((d) => d.id === deckId) ?? decks[0];
@@ -46,13 +54,13 @@ export default function QuizOverlay({ park, open, onClose }: Props) {
       lastFocus.current = document.activeElement as HTMLElement;
       document.body.style.overflow = 'hidden';
       setPhase('setup');
-      setDeckId(decks[0].id);
+      setDeckId(firstQuizDeckId(park));
       setScope('all');
     } else {
       document.body.style.overflow = '';
       lastFocus.current?.focus();
     }
-  }, [open, decks]);
+  }, [open, park]);
 
   // Escape closes the overlay
   useEffect(() => {
@@ -78,11 +86,15 @@ export default function QuizOverlay({ park, open, onClose }: Props) {
         a: order.findIndex((o) => o.correct),
       };
     });
+    // Guard against an empty bank (e.g. a deck with no quiz questions) — there
+    // is nothing to play, so stay on setup rather than show a 0/0 round.
+    if (prepared.length === 0) return;
     setPool(prepared);
     setIdx(0);
     setScore(0);
     setLocked(false);
     setSelected(null);
+    setResult(null);
     setPhase('play');
   }
 
@@ -95,6 +107,7 @@ export default function QuizOverlay({ park, open, onClose }: Props) {
 
   function next() {
     if (idx + 1 >= pool.length) {
+      setResult(recordRound(park.slug, deckId, scope, score, pool.length));
       setPhase('results');
       return;
     }
@@ -162,7 +175,14 @@ export default function QuizOverlay({ park, open, onClose }: Props) {
         )}
 
         {phase === 'results' && (
-          <QuizResults score={score} total={pool.length} onPlayAgain={playAgain} onBackToMap={onClose} />
+          <QuizResults
+            score={score}
+            total={pool.length}
+            best={result?.best ?? null}
+            isNewBest={result?.isNewBest ?? false}
+            onPlayAgain={playAgain}
+            onBackToMap={onClose}
+          />
         )}
       </div>
     </section>

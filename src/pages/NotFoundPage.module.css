@@ -1,0 +1,7 @@
+.wrap{position:relative;z-index:1;max-width:760px;margin:0 auto;padding:0 18px 80px}
+
+.notfound{padding:96px 4px 80px;text-align:center}
+.notfound h1{font-family:var(--display);font-weight:700;font-size:clamp(36px,9vw,52px);margin-bottom:12px;transform:rotate(-1.5deg)}
+.notfound p{color:var(--pencil-soft);margin-bottom:20px;font-size:18px}
+.notfound a{font-family:var(--mono);font-size:15px;color:var(--accent);text-transform:uppercase;letter-spacing:.08em;text-decoration:none}
+.notfound a:hover{text-decoration:underline;text-decoration-style:wavy;text-underline-offset:3px}

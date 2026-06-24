@@ -80,6 +80,8 @@ const EN = {
   // QuizResults
   playAgain: 'Play again',
   backToMap: 'Back to the map',
+  newBest: '★ New personal best!',
+  yourBest: (score: number, total: number) => `Your best: ${score} / ${total}`,
   ranks: {
     superintendent: { title: 'Park Superintendent', message: 'Flawless. You know this park cold.' },
     seniorNaturalist: { title: 'Senior Naturalist', message: 'Impressive — you could lead the walk.' },
@@ -161,6 +163,8 @@ const ES: Partial<UIStrings> = {
   // QuizResults
   playAgain: 'Jugar de nuevo',
   backToMap: 'Volver al mapa',
+  newBest: '★ ¡Nuevo récord personal!',
+  yourBest: (score, total) => `Tu mejor marca: ${score} / ${total}`,
   ranks: {
     superintendent: {
       title: 'Superintendente del parque',

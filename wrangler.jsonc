@@ -1,11 +1,13 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "trailside-trivia",
+  "main": "worker/index.ts",
   "compatibility_date": "2026-06-01",
   "assets": {
+    "binding": "ASSETS",
     "not_found_handling": "single-page-application"
   }
-  // When you add the API Worker later, also set:
-  // "main": "worker/index.ts",
+  // Global high-score board (optional): create the namespace, then uncomment.
+  //   wrangler kv namespace create SCORES
   // "kv_namespaces": [{ "binding": "SCORES", "id": "<your-kv-id>" }]
 }

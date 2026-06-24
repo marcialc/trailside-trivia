@@ -1,0 +1,47 @@
+name: 🏞️ Park request
+description: Request a new national park field guide. A maintainer adds the `park-request` label to start the automated draft → review → translate → PR pipeline.
+title: "Park request: "
+labels: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Request a new park. Once a maintainer applies the **`park-request`** label, an automated pipeline drafts the data file, fact-checks and reviews it, translates it to Spanish, runs the build/test/lint gates, and opens a pull request for human review. **The PR is never auto-merged — a person verifies the facts and merges.**
+  - type: input
+    id: park_name
+    attributes:
+      label: Park name
+      placeholder: Zion National Park
+    validations:
+      required: true
+  - type: input
+    id: region
+    attributes:
+      label: Region
+      description: "Shown as the hero eyebrow, e.g. \"State · subregion\""
+      placeholder: Utah · Colorado Plateau
+    validations:
+      required: false
+  - type: input
+    id: slug
+    attributes:
+      label: URL slug (optional)
+      description: Defaults to a kebab-case version of the park name (used as the route, e.g. /zion).
+      placeholder: zion
+    validations:
+      required: false
+  - type: input
+    id: decks
+    attributes:
+      label: Decks to include
+      description: Comma-separated collections.
+      placeholder: Places, Animals
+    validations:
+      required: false
+  - type: textarea
+    id: notes
+    attributes:
+      label: Notes & sources
+      description: Anything the draft must include, plus authoritative sources (NPS / USGS links) to ground the facts.
+    validations:
+      required: false

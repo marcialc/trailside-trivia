@@ -68,4 +68,5 @@
 .bigscore small{font-size:.38em;color:var(--pencil-soft);font-weight:400}
 .rank{font-family:var(--mono);font-size:16px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin:18px 0 8px;font-weight:700}
 .rsub{color:var(--pencil);max-width:38ch;margin:0 auto 4px;font-size:18px}
+.best{font-family:var(--mono);font-size:14px;letter-spacing:.1em;text-transform:uppercase;color:var(--right);font-weight:700;margin-top:12px;transform:rotate(-1deg)}
 .results .qfoot{width:100%;max-width:360px;margin-top:28px}

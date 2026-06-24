@@ -78,8 +78,11 @@ export default function SearchBar({ query, placeholder, matches, onChange, onSel
           autoComplete="off"
           spellCheck={false}
           aria-label={ui.searchAria}
+          role="combobox"
+          aria-autocomplete="list"
           aria-expanded={showAc}
           aria-controls="ac"
+          aria-activedescendant={showAc && acIndex >= 0 ? `ac-opt-${acIndex}` : undefined}
           onChange={(e) => {
             onChange(e.target.value);
             setOpen(true);
@@ -106,6 +109,7 @@ export default function SearchBar({ query, placeholder, matches, onChange, onSel
           {matches.map((m, i) => (
             <div
               key={m.subject.id}
+              id={`ac-opt-${i}`}
               className={`${styles.acItem} ${i === acIndex ? styles.acActive : ''}`}
               role="option"
               aria-selected={i === acIndex}

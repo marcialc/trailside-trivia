@@ -1,4 +1,4 @@
-import type { LocalizedString } from '../i18n/t';
+import type { LocalizedString } from '../i18n/localized';
 
 // Translatable string fields use LocalizedString: a bare string is English-only
 // (and serves as the placeholder until translated), or `{ en, es }` to localize.

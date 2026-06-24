@@ -1,0 +1,18 @@
+# Local dev secrets for the Worker. Copy to `.dev.vars` (which is gitignored)
+# and fill in. For PRODUCTION, set each with `wrangler secret put <NAME>` —
+# `.dev.vars` is only read during `npm run dev` / local builds.
+
+# Fine-grained GitHub PAT with "Issues: Read and write" on the target repo.
+# Used by POST /api/park-request to open labelled `park-request` issues, which
+# trigger .github/workflows/add-park.yml. Without it, /api/park-request is 503.
+GITHUB_TOKEN=github_pat_xxxxxxxx
+
+# Cloudflare Turnstile SECRET key (pairs with VITE_TURNSTILE_SITE_KEY on the
+# client). For local testing, Cloudflare's always-passes test secret works:
+TURNSTILE_SECRET=1x0000000000000000000000000000000AA
+
+# Optional: override the target repo. Defaults to marcialc/trailside-trivia.
+# GITHUB_REPO=marcialc/trailside-trivia
+
+# (existing) Cloudflare AI Gateway token used by the add-park pipeline.
+# CF_AIG_TOKEN=...

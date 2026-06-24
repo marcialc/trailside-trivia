@@ -10,4 +10,10 @@
   // Global high-score board (optional): create the namespace, then uncomment.
   //   wrangler kv namespace create SCORES
   // "kv_namespaces": [{ "binding": "SCORES", "id": "<your-kv-id>" }]
+  //
+  // "Request a park" endpoint (POST /api/park-request) — set as secrets, not here:
+  //   wrangler secret put GITHUB_TOKEN       # fine-grained PAT, Issues: read+write on the repo
+  //   wrangler secret put TURNSTILE_SECRET   # Cloudflare Turnstile secret key
+  // Client needs VITE_TURNSTILE_SITE_KEY at build time (see .env.example).
+  // Without these, /api/park-request returns 503 and the form shows as unavailable.
 }

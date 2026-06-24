@@ -2,31 +2,16 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { PARKS } from '../data';
 import { NATIONAL_PARKS, type NationalPark } from '../data/nationalParks';
 import { highlight } from '../lib/highlight';
+import { TURNSTILE_SITE_KEY, loadTurnstile, type TurnstileApi } from '../lib/turnstile';
 import { useUI } from '../i18n/strings';
 import styles from './RequestParkOverlay.module.css';
-
-// The GitHub repo whose prefilled issue form we deep-link into. The add-park
-// pipeline (.github/workflows/add-park.yml) runs once a maintainer applies the
-// `park-request` label to the resulting issue.
-const REPO = 'marcialc/trailside-trivia';
 
 interface Props {
   open: boolean;
   onClose: () => void;
 }
 
-function buildIssueUrl(park: NationalPark, notes: string): string {
-  const fullName = `${park.name} National Park`;
-  const params = new URLSearchParams({
-    template: 'park-request.yml',
-    title: `Park request: ${fullName}`,
-    park_name: fullName,
-    region: park.state,
-  });
-  const trimmed = notes.trim();
-  if (trimmed) params.set('notes', trimmed);
-  return `https://github.com/${REPO}/issues/new?${params.toString()}`;
-}
+type Status = 'idle' | 'submitting' | 'success' | 'error';
 
 export default function RequestParkOverlay({ open, onClose }: Props) {
   const ui = useUI();
@@ -37,9 +22,16 @@ export default function RequestParkOverlay({ open, onClose }: Props) {
   const [acOpen, setAcOpen] = useState(false);
   const [acIndex, setAcIndex] = useState(-1);
 
+  const [status, setStatus] = useState<Status>('idle');
+  const [errorMsg, setErrorMsg] = useState('');
+  const [token, setToken] = useState('');
+
   const inputRef = useRef<HTMLInputElement>(null);
   const boxRef = useRef<HTMLDivElement>(null);
   const lastFocus = useRef<HTMLElement | null>(null);
+  const widgetHost = useRef<HTMLDivElement>(null);
+  const turnstile = useRef<TurnstileApi | null>(null);
+  const widgetId = useRef<string | null>(null);
 
   // Parks not yet covered by the app, by slug. Recomputed only if PARKS changes.
   const available = useMemo(() => {
@@ -57,6 +49,7 @@ export default function RequestParkOverlay({ open, onClose }: Props) {
   }, [available, query]);
 
   const showAc = acOpen && matches.length > 0;
+  const canSubmit = !!selected && !!token && status !== 'submitting';
 
   // Fresh form each time it opens; keep last content during the slide-out.
   useEffect(() => {
@@ -66,6 +59,9 @@ export default function RequestParkOverlay({ open, onClose }: Props) {
       setNotes('');
       setAcOpen(false);
       setAcIndex(-1);
+      setStatus('idle');
+      setErrorMsg('');
+      setToken('');
     }
   }, [open]);
 
@@ -80,6 +76,34 @@ export default function RequestParkOverlay({ open, onClose }: Props) {
       lastFocus.current?.focus();
     }
   }, [open]);
+
+  // Render the Turnstile widget while open; tear it down on close.
+  useEffect(() => {
+    const siteKey = TURNSTILE_SITE_KEY;
+    if (!open || !siteKey) return;
+    let cancelled = false;
+    loadTurnstile()
+      .then((api) => {
+        if (cancelled || !widgetHost.current) return;
+        turnstile.current = api;
+        widgetId.current = api.render(widgetHost.current, {
+          sitekey: siteKey,
+          callback: (t) => setToken(t),
+          'expired-callback': () => setToken(''),
+          'error-callback': () => setToken(''),
+        });
+      })
+      .catch(() => {
+        if (!cancelled) setErrorMsg(ui.requestParkError);
+      });
+    return () => {
+      cancelled = true;
+      if (turnstile.current && widgetId.current) {
+        turnstile.current.remove(widgetId.current);
+      }
+      widgetId.current = null;
+    };
+  }, [open, ui.requestParkError]);
 
   // Escape closes the overlay (or just the dropdown if it's open).
   useEffect(() => {
@@ -128,12 +152,39 @@ export default function RequestParkOverlay({ open, onClose }: Props) {
     }
   }
 
-  function onSubmit(e: React.FormEvent) {
+  async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!selected) return;
-    window.open(buildIssueUrl(selected, notes), '_blank', 'noopener,noreferrer');
-    onClose();
+    if (!selected || !token) return;
+    setStatus('submitting');
+    setErrorMsg('');
+    try {
+      const res = await fetch('/api/park-request', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ slug: selected.slug, notes, turnstileToken: token }),
+      });
+      const data = (await res.json().catch(() => ({}))) as { error?: string; code?: string };
+      if (res.ok) {
+        setStatus('success');
+        return;
+      }
+      // Map the few user-actionable cases; everything else is generic.
+      if (data.code === 'exists') setErrorMsg(ui.requestParkErrorExists);
+      else if (data.code === 'requested') setErrorMsg(ui.requestParkErrorRequested);
+      else setErrorMsg(ui.requestParkError);
+      setStatus('error');
+      // Let them retry: a Turnstile token is single-use.
+      if (turnstile.current && widgetId.current) turnstile.current.reset(widgetId.current);
+      setToken('');
+    } catch {
+      setErrorMsg(ui.requestParkError);
+      setStatus('error');
+      if (turnstile.current && widgetId.current) turnstile.current.reset(widgetId.current);
+      setToken('');
+    }
   }
+
+  const notConfigured = !TURNSTILE_SITE_KEY;
 
   return (
     <>
@@ -156,75 +207,84 @@ export default function RequestParkOverlay({ open, onClose }: Props) {
           <p className={styles.sub}>{ui.requestParkLede}</p>
         </div>
 
-        <form className={styles.body} onSubmit={onSubmit}>
-          <label className={styles.label} htmlFor="requestParkSearch">
-            {ui.requestParkSelectLabel}
-          </label>
-
-          {available.length === 0 ? (
-            <p className={styles.allAdded}>{ui.requestParkAllAdded}</p>
-          ) : (
-            <div className={styles.searchbox} ref={boxRef}>
-              <input
-                ref={inputRef}
-                id="requestParkSearch"
-                className={styles.input}
-                type="text"
-                value={query}
-                placeholder={ui.requestParkSelectPlaceholder}
-                autoComplete="off"
-                spellCheck={false}
-                aria-label={ui.requestParkSelectAria}
-                role="combobox"
-                aria-autocomplete="list"
-                aria-expanded={showAc}
-                aria-controls="requestParkAc"
-                aria-activedescendant={showAc && acIndex >= 0 ? `rp-opt-${acIndex}` : undefined}
-                onChange={(e) => {
-                  setQuery(e.target.value);
-                  setSelected(null);
-                  setAcOpen(true);
-                }}
-                onFocus={() => setAcOpen(true)}
-                onKeyDown={onKeyDown}
-              />
-              <div
-                className={`${styles.ac} ${showAc ? styles.acOpen : ''}`}
-                id="requestParkAc"
-                role="listbox"
-              >
-                {matches.map((p, i) => (
-                  <div
-                    key={p.slug}
-                    id={`rp-opt-${i}`}
-                    className={`${styles.acItem} ${i === acIndex ? styles.acActive : ''}`}
-                    role="option"
-                    aria-selected={i === acIndex}
-                    onMouseDown={(e) => {
-                      e.preventDefault();
-                      choose(p);
-                    }}
-                  >
-                    <div className={styles.acText}>
-                      <div className={styles.acName}>
-                        {highlight(p.name, query, (chunk, key) => (
-                          <b key={key}>{chunk}</b>
-                        ))}
-                      </div>
-                      <div className={styles.acState}>{p.state}</div>
-                    </div>
-                    <span className={styles.acArrow}>→</span>
-                  </div>
-                ))}
+        <div className={styles.body}>
+          {status === 'success' ? (
+            <div className={styles.success}>
+              <div className={styles.successMark} aria-hidden="true">
+                ✓
               </div>
-              {acOpen && query.trim() && matches.length === 0 && (
-                <p className={styles.noMatches}>{ui.requestParkNoMatches}</p>
-              )}
+              <p className={styles.successText}>{ui.requestParkSuccess}</p>
+              <button className={styles.submit} type="button" onClick={onClose}>
+                {ui.requestParkDone}
+              </button>
             </div>
-          )}
+          ) : available.length === 0 ? (
+            <p className={styles.allAdded}>{ui.requestParkAllAdded}</p>
+          ) : notConfigured ? (
+            <p className={styles.allAdded}>{ui.requestParkUnavailable}</p>
+          ) : (
+            <form onSubmit={onSubmit}>
+              <label className={styles.label} htmlFor="requestParkSearch">
+                {ui.requestParkSelectLabel}
+              </label>
+              <div className={styles.searchbox} ref={boxRef}>
+                <input
+                  ref={inputRef}
+                  id="requestParkSearch"
+                  className={styles.input}
+                  type="text"
+                  value={query}
+                  placeholder={ui.requestParkSelectPlaceholder}
+                  autoComplete="off"
+                  spellCheck={false}
+                  aria-label={ui.requestParkSelectAria}
+                  role="combobox"
+                  aria-autocomplete="list"
+                  aria-expanded={showAc}
+                  aria-controls="requestParkAc"
+                  aria-activedescendant={showAc && acIndex >= 0 ? `rp-opt-${acIndex}` : undefined}
+                  onChange={(e) => {
+                    setQuery(e.target.value);
+                    setSelected(null);
+                    setAcOpen(true);
+                  }}
+                  onFocus={() => setAcOpen(true)}
+                  onKeyDown={onKeyDown}
+                />
+                <div
+                  className={`${styles.ac} ${showAc ? styles.acOpen : ''}`}
+                  id="requestParkAc"
+                  role="listbox"
+                >
+                  {matches.map((p, i) => (
+                    <div
+                      key={p.slug}
+                      id={`rp-opt-${i}`}
+                      className={`${styles.acItem} ${i === acIndex ? styles.acActive : ''}`}
+                      role="option"
+                      aria-selected={i === acIndex}
+                      onMouseDown={(e) => {
+                        e.preventDefault();
+                        choose(p);
+                      }}
+                    >
+                      <div className={styles.acText}>
+                        <div className={styles.acName}>
+                          {highlight(p.name, query, (chunk, key) => (
+                            <b key={key}>{chunk}</b>
+                          ))}
+                        </div>
+                        <div className={styles.acState}>{p.state}</div>
+                      </div>
+                      <span className={styles.acArrow}>→</span>
+                    </div>
+                  ))}
+                </div>
+                {acOpen && query.trim() && matches.length === 0 && (
+                  <p className={styles.noMatches}>{ui.requestParkNoMatches}</p>
+                )}
+              </div>
 
-          {available.length > 0 && (
-            <>
               <label className={styles.label} htmlFor="requestParkNotes">
                 {ui.requestParkNotesLabel}
               </label>
@@ -234,15 +294,24 @@ export default function RequestParkOverlay({ open, onClose }: Props) {
                 value={notes}
                 placeholder={ui.requestParkNotesPlaceholder}
                 rows={3}
+                maxLength={2000}
                 onChange={(e) => setNotes(e.target.value)}
               />
 
-              <button className={styles.submit} type="submit" disabled={!selected}>
-                {ui.requestParkSubmit}
+              <div className={styles.turnstile} ref={widgetHost} />
+
+              {status === 'error' && errorMsg && (
+                <p className={styles.errorText} role="alert">
+                  {errorMsg}
+                </p>
+              )}
+
+              <button className={styles.submit} type="submit" disabled={!canSubmit}>
+                {status === 'submitting' ? ui.requestParkSubmitting : ui.requestParkSubmit}
               </button>
-            </>
+            </form>
           )}
-        </form>
+        </div>
       </aside>
     </>
   );

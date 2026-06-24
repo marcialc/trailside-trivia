@@ -37,4 +37,25 @@
 .foot{display:flex;align-items:center;gap:12px;margin-top:16px;padding-top:12px;border-top:2px dashed var(--muted);font-family:var(--mono);font-size:14px;color:var(--pencil-soft)}
 .go{margin-left:auto;color:var(--ink);font-weight:700}
 
+/* "Request a park" entry — a dashed call-to-action card at the end of the grid */
+.requestCard{
+  position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;
+  text-align:center;color:var(--pencil);
+  background:transparent;border:3px dashed var(--pencil);border-radius:var(--wobbly-md);
+  padding:28px 20px;min-height:140px;cursor:pointer;font:inherit;
+  --rot:1deg;transform:rotate(var(--rot));
+  transition:transform .1s,box-shadow .1s,background .1s;
+  animation:fade .5s both;
+}
+.requestCard:hover{background:var(--postit);transform:rotate(-1deg) translate(2px,2px);box-shadow:2px 2px 0 0 var(--pencil)}
+.requestCard:active{transform:rotate(-1deg) translate(4px,4px);box-shadow:none}
+.requestCard:focus-visible{outline:3px dashed var(--ink);outline-offset:4px}
+.requestPlus{
+  display:flex;align-items:center;justify-content:center;width:46px;height:46px;
+  border:3px solid var(--pencil);border-radius:48% 52% 50% 50% / 52% 48% 52% 48%;
+  font-family:var(--display);font-weight:700;font-size:30px;line-height:1;color:var(--ink);
+}
+.requestLabel{font-family:var(--display);font-weight:700;font-size:22px;line-height:1.04}
+.requestHint{font-family:var(--mono);font-size:13px;letter-spacing:.06em;color:var(--pencil-soft)}
+
 @keyframes fade{from{opacity:0}to{opacity:1}}

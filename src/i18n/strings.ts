@@ -25,6 +25,22 @@ const EN = {
   subjectCount: (n: number) => `${n} subjects`,
   open: 'Open →',
 
+  // RequestParkOverlay
+  requestParkCta: 'Request a park',
+  requestParkCtaHint: "Don't see a park? Suggest one →",
+  requestParkTitle: 'Request a park',
+  requestParkLede:
+    "Pick a national park we don't cover yet. Submitting opens a prefilled request on GitHub — confirm it there and a field guide gets drafted for review.",
+  requestParkSelectLabel: 'National park',
+  requestParkSelectPlaceholder: 'Search national parks…',
+  requestParkSelectAria: 'Search and select a national park to request',
+  requestParkNoMatches: 'No matching parks.',
+  requestParkAllAdded: 'Every national park is already covered. 🎉',
+  requestParkNotesLabel: 'Notes & sources (optional)',
+  requestParkNotesPlaceholder: 'Anything the draft should include, plus authoritative sources…',
+  requestParkSubmit: 'Open request on GitHub →',
+  requestParkClose: 'Close',
+
   // ParkPage
   notFoundTitle: 'Off the map.',
   notFoundBody: "We don't have a field guide for that park yet.",
@@ -107,6 +123,22 @@ const ES: Partial<UIStrings> = {
   deckCount: (n) => `${n} ${n === 1 ? 'mazo' : 'mazos'}`,
   subjectCount: (n) => `${n} ${n === 1 ? 'ficha' : 'fichas'}`,
   open: 'Abrir →',
+
+  // RequestParkOverlay
+  requestParkCta: 'Solicitar un parque',
+  requestParkCtaHint: '¿No ves un parque? Sugiérelo →',
+  requestParkTitle: 'Solicitar un parque',
+  requestParkLede:
+    'Elige un parque nacional que aún no cubrimos. Al enviarlo se abre una solicitud prellenada en GitHub: confírmala allí y se redactará una guía de campo para revisión.',
+  requestParkSelectLabel: 'Parque nacional',
+  requestParkSelectPlaceholder: 'Buscar parques nacionales…',
+  requestParkSelectAria: 'Busca y selecciona un parque nacional para solicitar',
+  requestParkNoMatches: 'No hay parques que coincidan.',
+  requestParkAllAdded: 'Ya cubrimos todos los parques nacionales. 🎉',
+  requestParkNotesLabel: 'Notas y fuentes (opcional)',
+  requestParkNotesPlaceholder: 'Lo que deba incluir el borrador, además de fuentes confiables…',
+  requestParkSubmit: 'Abrir solicitud en GitHub →',
+  requestParkClose: 'Cerrar',
 
   // ParkPage
   notFoundTitle: 'Fuera del mapa.',

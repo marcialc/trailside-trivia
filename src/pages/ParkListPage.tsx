@@ -1,14 +1,16 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, Navigate } from 'react-router-dom';
 import { PARKS } from '../data';
 import { useT } from '../i18n/t';
 import { useUI } from '../i18n/strings';
 import LanguageSwitcher from '../components/LanguageSwitcher';
+import RequestParkOverlay from '../components/RequestParkOverlay';
 import styles from './ParkListPage.module.css';
 
 export default function ParkListPage() {
   const tt = useT();
   const ui = useUI();
+  const [requestOpen, setRequestOpen] = useState(false);
 
   useEffect(() => {
     document.title = ui.listDocTitle;
@@ -49,7 +51,17 @@ export default function ParkListPage() {
             </Link>
           );
         })}
+
+        <button type="button" className={styles.requestCard} onClick={() => setRequestOpen(true)}>
+          <span className={styles.requestPlus} aria-hidden="true">
+            +
+          </span>
+          <span className={styles.requestLabel}>{ui.requestParkCta}</span>
+          <span className={styles.requestHint}>{ui.requestParkCtaHint}</span>
+        </button>
       </div>
+
+      <RequestParkOverlay open={requestOpen} onClose={() => setRequestOpen(false)} />
     </div>
   );
 }

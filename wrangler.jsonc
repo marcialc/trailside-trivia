@@ -3,6 +3,9 @@
   "name": "trailside-trivia",
   "main": "worker/index.ts",
   "compatibility_date": "2026-06-01",
+  // Serve only on the custom domain (trivia.getcampsite.org); disable the *.workers.dev URL.
+  // Without this, every `wrangler deploy` re-enables the workers.dev route.
+  "workers_dev": false,
   "assets": {
     "binding": "ASSETS",
     "not_found_handling": "single-page-application"
